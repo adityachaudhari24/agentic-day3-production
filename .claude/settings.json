@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ln -sf \"v1.3.0.yaml\" \"current.yaml\")"
+    ]
+  }
+}
