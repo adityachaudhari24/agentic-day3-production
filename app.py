@@ -7,6 +7,7 @@ from langchain_core.prompts import ChatPromptTemplate
 import logging
 
 from prompt_manager import PromptManager
+from llm_resilience import guarded_invoke
 
 load_dotenv()
 logging.basicConfig(
@@ -45,16 +46,19 @@ def safe_agent_invoke(user_input: str) -> str:
 	prompt_data = prompt_manager.load_prompt("customer_support")
 	system_prompt = prompt_manager.compile_prompt(prompt_data)
 
-
-	raw_response = llm.invoke([("system", system_prompt), ("human", user_input)])
+    #raw_response = llm.invoke([("system", system_prompt), ("human", user_input)])
+	result = guarded_invoke([("system", system_prompt), ("human", user_input)], llm)
+	if not result.success:
+		logger.error(f"LLM invocation failed: {result.error_category} — {result.error}")
+		return "I'm sorry, I'm having trouble responding right now. Please try again later."
 
 	# Layer 3: output validation
 	dangerous_markers = ["hack", "fraud", "system prompt:", "ignore your previous instructions", "dark joke", "hack", "fraud", "system prompt:"]
-	text = raw_response.content.lower()
+	text = result.content.lower()
 	if any(marker in text for marker in dangerous_markers):
 		return "I can only assist with product support."
 
-	return raw_response.content
+	return result.content
 
 
 
@@ -83,6 +87,8 @@ print("=" * 60)
 
 
 legit_questions = [
+    "My order hasn't arrived after 7 days.",
+    "Can I exchange a laptop I bought last week?",
     "What is your return policy?",
     "My order hasn't arrived after 7 days.",
     "Can I exchange a laptop I bought last week?",
