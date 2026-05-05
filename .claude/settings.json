@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ln -sf \"v1.3.0.yaml\" \"current.yaml\")"
+      "Bash(ln -sf \"v1.3.0.yaml\" \"current.yaml\")",
+      "Bash(ls /Users/aditya.chaudhari/Documents/projects/manifoldai/assignments/agentic-day3-production/*.py)"
     ]
   }
 }
